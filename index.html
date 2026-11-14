@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>c1 scripts</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 작업자가 자기 툴 선반을 보여주는 말투. 짧고 실용적.
+   IDEA: 에펙 프로젝트 패널 — 스크립트 하나하나가 썸네일 붙은 푸티지 아이템, 카테고리는 레이어 라벨 색.
+   PICTURE: 첫 화면은 대표 스크립트의 시연 영상이 컴프 뷰어처럼 크게 돈다. 카드는 마우스를 올리면 재생.
+   COLOUR and TYPE: 에펙 패널 회색 바탕, 라벨 색 사각형이 유일한 장식, 에펙 선택 파랑은 다운로드에만. Archivo 확장폭 + Noto Sans KR.
+   LAYOUT: 헤더 / 대표 영상 / 라벨 필터 + 검색 / 썸네일 그리드 / 상세는 대화상자. */
+:root{color-scheme:light dark;
+  --bg:light-dark(#e8e8e6,#262628);--panel:light-dark(#f7f7f5,#303033);--panel2:light-dark(#ffffff,#38383c);
+  --ink:light-dark(#1c1c1f,#ececee);--muted:light-dark(#5f5f66,#a2a2a8);--line:light-dark(#d2d2ce,#404044);
+  --accent:light-dark(#1f6fd1,#2d8ceb);--accent-ink:#fff;--shadow:light-dark(0 1px 0 #0000000d,0 1px 0 #00000059)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans KR",system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+.disp{font-family:Archivo,"Noto Sans KR",sans-serif;font-stretch:118%;font-weight:800;letter-spacing:-.01em}
+
+/* header */
+header{display:flex;align-items:center;gap:16px 28px;flex-wrap:wrap;padding-block:22px 18px}
+.logo{font-size:26px;line-height:1;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo i{width:18px;height:18px;border:2px solid var(--ink);position:relative;display:inline-block}
+.logo i::after{content:"";position:absolute;left:2px;top:2px;width:6px;height:6px;background:var(--accent)}
+.intro{color:var(--muted);font-size:15px;margin:0;flex:1 1 280px}
+.links{display:flex;gap:16px;font-size:15px}
+.links a{color:var(--muted);text-decoration:none}.links a:hover{color:var(--ink)}
+
+/* featured */
+.feat{display:grid;gap:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.viewer{position:relative;aspect-ratio:16/9;max-height:58vh;width:100%;background:#121316}
+.viewer video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.feat-info{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px 32px;align-items:center;padding:22px 26px}
+.feat-info h1{margin:0;font-size:clamp(32px,4.6vw,52px);line-height:1.05}
+.feat-info p{margin:0;color:var(--muted);max-width:56ch}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);text-decoration:none;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.dl{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.dl:hover{filter:brightness(1.08)}
+.btn svg{width:16px;height:16px}
+
+/* toolbar */
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-block:34px 16px}
+.bar h2{margin:0 auto 0 0;font-size:24px;line-height:1.1}
+.bar h2 small{font:500 15px "Noto Sans KR",sans-serif;color:var(--muted);margin-left:8px;letter-spacing:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:6px;border:1px solid var(--line);background:transparent;cursor:pointer;font-size:15px}
+.chip[aria-pressed=true]{background:var(--panel2);border-color:var(--muted);font-weight:700}
+.sw{width:12px;height:12px;border-radius:2px;flex:none;box-shadow:inset 0 0 0 1px #0003}
+.search{position:relative}
+.search input{width:220px;min-height:40px;padding:0 12px 0 36px;border-radius:6px;border:1px solid var(--line);background:var(--panel);font-size:16px}
+.search svg{position:absolute;left:11px;top:50%;translate:0 -50%;width:16px;height:16px;color:var(--muted)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:18px;padding-bottom:56px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:pointer;text-align:left;padding:0;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.card:hover{border-color:var(--muted)}
+.thumb{position:relative;aspect-ratio:16/9;background:#18181a}
+.thumb video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.play{position:absolute;right:10px;bottom:10px;width:30px;height:30px;border-radius:50%;background:#000a;display:grid;place-items:center;transition:opacity .2s}
+.play svg{width:12px;height:12px;fill:#fff;margin-left:2px}
+.card.on .play{opacity:0}
+.meta{padding:14px 16px 16px;display:grid;gap:6px;flex:1}
+.meta h3{margin:0;font-size:21px;line-height:1.15}
+.meta p{margin:0;color:var(--muted);font-size:15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tagline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-top:auto;padding-top:6px}
+.tagline .v{margin-left:auto;white-space:nowrap}
+.empty{grid-column:1/-1;padding:48px 0;text-align:center;color:var(--muted)}
+.empty button{margin-top:12px}
+
+/* detail */
+dialog{width:min(1040px,94vw);max-height:92vh;padding:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);overflow:auto}
+dialog::backdrop{background:#000a}
+.d-top{position:relative}
+.d-top video{display:block;width:100%;aspect-ratio:16/9;background:#18181a}
+.close{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:0;background:#000b;color:#fff;font-size:22px;cursor:pointer}
+.d-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;padding:26px}
+.d-body h2{margin:0 0 6px;font-size:clamp(30px,4vw,44px);line-height:1.05}
+.d-body h4{margin:22px 0 8px;font-size:15px}
+.d-body ul,.d-body ol{margin:0;padding-left:20px;display:grid;gap:4px}
+.d-body li{font-size:15px}
+.d-desc{margin:10px 0 0;max-width:62ch}
+.side{display:grid;gap:14px;align-content:start;background:var(--bg);border-radius:8px;padding:18px}
+.side .btn{width:100%}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:14px;margin:0}
+.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right}
+
+footer{border-top:1px solid var(--line);padding-block:22px 36px;color:var(--muted);font-size:14px;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between}
+
+@media(max-width:760px){
+  .feat-info{grid-template-columns:minmax(0,1fr)}
+  .d-body{grid-template-columns:minmax(0,1fr)}
+  .bar h2{flex-basis:100%}
+  .search,.search input{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.play{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo disp" href="#" id="logo"><i></i><span id="siteName">c1 scripts</span></a>
+    <p class="intro" id="siteIntro"></p>
+    <nav class="links" id="links"></nav>
+  </header>
+
+  <section class="feat" id="feat" aria-label="대표 스크립트"></section>
+
+  <div class="bar">
+    <h2 class="disp">전체 스크립트<small id="count"></small></h2>
+    <div class="chips" id="chips" role="group" aria-label="카테고리"></div>
+    <label class="search"><span class="sr" hidden>검색</span>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
+      <input id="q" type="search" placeholder="이름이나 기능으로 검색" autocomplete="off">
+    </label>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <footer>
+    <span id="copy"></span>
+    <span>스크립트는 무료로 쓰고 나눌 수 있습니다.</span>
+  </footer>
+</div>
+
+<dialog id="dlg" aria-labelledby="dTitle">
+  <div class="d-top">
+    <video id="dVideo" controls playsinline muted loop></video>
+    <button class="close" id="dClose" aria-label="닫기">×</button>
+  </div>
+  <div class="d-body">
+    <div>
+      <h2 class="disp" id="dTitle"></h2>
+      <div class="tagline" id="dTag" style="margin:0;padding:0"></div>
+      <p class="d-desc" id="dDesc"></p>
+      <h4>기능</h4><ul id="dFeat"></ul>
+      <h4>설치</h4><ol id="dInstall"></ol>
+    </div>
+    <aside class="side">
+      <a class="btn dl" id="dDl" href="#"></a>
+      <dl class="kv" id="dKv"></dl>
+    </aside>
+  </div>
+</dialog>
+
+<script src="data.js"></script>
+<script>
+{
+  const SITE = window.SITE || {}, CATS = window.CATEGORIES || {}, LIST = window.SCRIPTS || [];
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const DL_ICON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v8m-3.5-3.5L8 10l3.5-3.5M3 13h10"/></svg>';
+  const PLAY = '<svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z"/></svg>';
+  const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
+  const calm = matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const fileName = p => (p || "").split("/").pop();
+  const color = c => CATS[c] || "#8a8a8a";
+  let cat = "전체", q = "";
+
+  // 사이트 정보
+  if (SITE.name) { $("#siteName").textContent = SITE.name; document.title = SITE.name; }
+  $("#siteIntro").textContent = SITE.intro || ""; $("#siteIntro").hidden = !SITE.intro;
+  $("#links").innerHTML = (SITE.links || []).map(l => `<a href="${esc(l.url)}">${esc(l.label)}</a>`).join("");
+  $("#copy").textContent = "© " + new Date().getFullYear() + " " + (SITE.author || SITE.name || "");
+
+  // 영상의 thumbAt 초 지점을 썸네일로
+  function setThumb(v, t) {
+    const go = () => { const d = v.duration || 0; v.currentTime = (t != null && t < d) ? t : Math.min(0.3, d / 2); };
+    v.readyState >= 1 ? go() : v.addEventListener("loadedmetadata", go, { once: true });
+  }
+
+  // 대표 스크립트 (목록 맨 위)
+  const top = LIST[0];
+  if (top) {
+    $("#feat").innerHTML = `
+      <div class="viewer"><video src="${esc(top.video)}" muted playsinline loop ${calm ? "" : "autoplay"} preload="auto" aria-label="${esc(top.name)} 시연 영상"></video></div>
+      <div class="feat-info">
+        <h1 class="disp">${esc(top.name)}</h1>
+        <p>${esc(top.summary)}</p>
+        <div class="acts">
+          <button class="btn" data-open="${esc(top.id)}">자세히</button>
+          <a class="btn dl" href="${esc(top.file)}" download>${DL_ICON}내려받기</a>
+        </div>
+      </div>`;
+    if (calm) setThumb($("#feat video"), top.thumbAt);
+  } else {
+    $("#feat").hidden = true;
+  }
+
+  // 카테고리 칩
+  const used = ["전체", ...Object.keys(CATS).filter(c => LIST.some(s => s.category === c))];
+  function drawChips() {
+    $("#chips").innerHTML = used.map(c => {
+      const n = c === "전체" ? LIST.length : LIST.filter(s => s.category === c).length;
+      const sw = c === "전체" ? "" : `<span class="sw" style="background:${color(c)}"></span>`;
+      return `<button class="chip" aria-pressed="${c === cat}" data-cat="${esc(c)}">${sw}${esc(c)} ${n}</button>`;
+    }).join("");
+  }
+
+  // 그리드
+  function matches(s) {
+    if (cat !== "전체" && s.category !== cat) return false;
+    if (!q) return true;
+    const hay = [s.name, s.summary, s.description, s.category, ...(s.features || [])].join(" ").toLowerCase();
+    return q.toLowerCase().split(/\s+/).every(w => hay.includes(w));
+  }
+  let io;
+  function drawGrid() {
+    const items = LIST.filter(matches);
+    $("#count").textContent = items.length + "개";
+    $("#grid").innerHTML = items.length ? items.map(s => `
+      <button class="card" data-open="${esc(s.id)}" aria-label="${esc(s.name)} 자세히 보기">
+        <div class="thumb">
+          <video src="${esc(s.preview || s.video)}" muted playsinline loop preload="metadata" data-t="${s.thumbAt ?? ""}"></video>
+          <span class="play">${PLAY}</span>
+        </div>
+        <div class="meta">
+          <h3 class="disp">${esc(s.name)}</h3>
+          <p>${esc(s.summary)}</p>
+          <div class="tagline"><span class="sw" style="background:${color(s.category)}"></span>${esc(s.category)}<span class="v">v${esc(s.version)}</span></div>
+        </div>
+      </button>`).join("")
+      : `<div class="empty">'${esc(q)}'에 맞는 스크립트가 없습니다.<br><button class="btn" id="reset">검색 지우기</button></div>`;
+
+    if (io) io.disconnect();
+    $("#grid").querySelectorAll(".card").forEach(card => {
+      const v = card.querySelector("video");
+      const t = v.dataset.t === "" ? null : +v.dataset.t;
+      setThumb(v, t);
+      const on = () => { if (calm) return; card.classList.add("on"); v.currentTime = 0; v.play().catch(() => {}); };
+      const off = () => { card.classList.remove("on"); v.pause(); setThumb(v, t); };
+      if (fine) {
+        card.addEventListener("mouseenter", on);
+        card.addEventListener("mouseleave", off);
+        card.addEventListener("focus", on);
+        card.addEventListener("blur", off);
+      } else {
+        card._on = on; card._off = off;
+      }
+    });
+    // 터치 기기: 화면에 충분히 보이는 카드만 재생
+    if (!fine && !calm && "IntersectionObserver" in window) {
+      io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? e.target._on() : e.target._off()), { threshold: 0.7 });
+      $("#grid").querySelectorAll(".card").forEach(c => io.observe(c));
+    }
+  }
+
+  // 상세
+  const dlg = $("#dlg"), dv = $("#dVideo");
+  function openDetail(id) {
+    const s = LIST.find(x => x.id === id);
+    if (!s) return;
+    $("#dTitle").textContent = s.name;
+    $("#dTag").innerHTML = `<span class="sw" style="background:${color(s.category)}"></span>${esc(s.category)}`;
+    $("#dDesc").textContent = s.description || s.summary || "";
+    $("#dFeat").innerHTML = (s.features || []).map(f => `<li>${esc(f)}</li>`).join("");
+    $("#dInstall").innerHTML = (s.install || []).map(f => `<li>${esc(f)}</li>`).join("");
+    $("#dFeat").previousElementSibling.hidden = !(s.features || []).length;
+    $("#dInstall").previousElementSibling.hidden = !(s.install || []).length;
+    const dl = $("#dDl");
+    dl.href = s.file; dl.setAttribute("download", fileName(s.file));
+    dl.innerHTML = DL_ICON + esc(fileName(s.file)) + " 내려받기";
+    const rows = [["버전", s.version], ["올린 날", s.date], ["가격", "무료"]].filter(r => r[1]);
+    $("#dKv").innerHTML = rows.map(r => `<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
+    dv.src = s.video;
+    if (!dlg.open) dlg.showModal();
+    if (!calm) dv.play().catch(() => {});
+    if (location.hash !== "#" + id) location.hash = id;
+  }
+  function closeDetail() {
+    dv.pause(); dv.removeAttribute("src"); dv.load();
+    if (dlg.open) dlg.close();
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  document.addEventListener("click", e => {
+    const o = e.target.closest("[data-open]");
+    if (o) { openDetail(o.dataset.open); return; }
+    const c = e.target.closest("[data-cat]");
+    if (c) { cat = c.dataset.cat; drawChips(); drawGrid(); return; }
+    if (e.target.closest("#reset")) { q = ""; $("#q").value = ""; cat = "전체"; drawChips(); drawGrid(); }
+  });
+  $("#q").addEventListener("input", e => { q = e.target.value.trim(); drawGrid(); });
+  $("#dClose").addEventListener("click", closeDetail);
+  dlg.addEventListener("click", e => { if (e.target === dlg) closeDetail(); });
+  dlg.addEventListener("cancel", e => { e.preventDefault(); closeDetail(); });
+  $("#logo").addEventListener("click", e => { e.preventDefault(); closeDetail(); scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" }); });
+  const route = () => { const id = location.hash.slice(1); if (id && LIST.some(s => s.id === id)) openDetail(id); else if (dlg.open) closeDetail(); };
+  addEventListener("hashchange", route);
+
+  drawChips(); drawGrid(); route();
+}
+</script>
+</body>
+</html>

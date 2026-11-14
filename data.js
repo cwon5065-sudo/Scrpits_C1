@@ -29,6 +29,32 @@ window.CATEGORIES = {
 
 window.SCRIPTS = [
   {
+    id: "fill-comp-shape",
+    name: "Fill Comp Shape",
+    version: "1.0",
+    date: "2026-11-14",
+    category: "레이어",
+    summary: "컴프 크기에 꼭 맞는 Shape Layer를 한 번에 만듭니다. 도형 13가지, 맞춤/덮기, 격자 분할까지.",
+    description: "도형을 고르고 생성을 누르면 활성 컴포지션 크기에 여백 없이 맞는 Shape Layer가 만들어집니다. 맞춤은 도형의 가로·세로 끝이 컴프 가장자리에 정확히 닿고, 덮기는 원이나 별처럼 모서리가 비는 도형도 컴프 전체를 덮도록 크기를 키웁니다. 가로·세로 개수를 넣으면 컴프를 격자로 나눠 칸마다 레이어를 하나씩 만들고, 타일마다 랜덤 색상을 줄 수도 있습니다.",
+    features: [
+      "도형 13가지: 사각형, 둥근 사각형, 원, 삼각형, 마름모, 평행사변형, 오·육·팔각형, N각형, 별 5각/N각, 십자",
+      "맞춤(Fit) / 덮기(Cover) 채우기 방식",
+      "가로 × 세로 격자로 빈틈없이 배치 (최대 100 × 100)",
+      "셀 크기와 도형 크기를 픽셀로 바로 표시",
+      "타일마다 랜덤 색상, 색상 직접 선택",
+      "만든 레이어를 맨 아래로 보내기"
+    ],
+    install: [
+      "After Effects에서 File › Scripts › Install ScriptUI Panel… 을 누르고 FillCompShape.jsx를 고릅니다.",
+      "After Effects를 다시 실행합니다.",
+      "Window 메뉴에서 FillCompShape.jsx를 열어 원하는 패널 옆에 붙입니다. 한 번만 쓸 땐 File › Scripts › Run Script File… 로 바로 실행해도 됩니다."
+    ],
+    file: "scripts/fill-comp-shape/FillCompShape.jsx",
+    video: "scripts/fill-comp-shape/demo.mp4",
+    preview: "scripts/fill-comp-shape/preview.mp4",
+    thumbAt: 8.6
+  },
+  {
     id: "random-flicker",
     name: "Random Flicker",
     version: "1.0",

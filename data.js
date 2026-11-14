@@ -29,6 +29,32 @@ window.CATEGORIES = {
 
 window.SCRIPTS = [
   {
+    id: "random-flicker",
+    name: "Random Flicker",
+    version: "1.0",
+    date: "2026-11-14",
+    category: "애니메이션",
+    summary: "셰이프 그룹이나 레이어를 무작위로 깜빡이게 합니다. 뚝뚝 끊기는 깜빡임과 부드러운 디졸브 중에서 고릅니다.",
+    description: "레이어를 선택하고 적용을 누르면 Opacity에 익스프레션이 들어가 무작위로 켜지고 꺼집니다. 셰이프 레이어는 안쪽 그룹(Ellipse 등) 하나하나가 따로 깜빡이고, 레이어 단위로도 걸 수 있습니다. 컨트롤러를 켜두면 Flicker Controller Null 레이어가 생겨서, 속도·확률·밝기·시드를 나중에 슬라이더로 다시 조절할 수 있습니다.",
+    features: [
+      "셰이프 그룹 단위 또는 레이어 단위로 적용",
+      "몇 프레임마다 바뀔지 설정 (초당 변경 횟수 표시)",
+      "깜빡임 / 디졸브 전환, 디졸브 길이와 이징",
+      "켜져 있을 확률, 켜짐·꺼짐 Opacity, 시드",
+      "Flicker Controller 레이어로 적용 후에도 조절",
+      "효과 제거 버튼으로 익스프레션 삭제"
+    ],
+    install: [
+      "After Effects에서 File › Scripts › Run Script File… 을 누르고 RandomFlicker.jsx를 고릅니다.",
+      "깜빡이게 할 레이어를 선택하고 설정 창에서 적용을 누릅니다.",
+      "자주 쓴다면 After Effects 설치 폴더의 Scripts 폴더에 넣어두면 File › Scripts 메뉴에 바로 나타납니다."
+    ],
+    file: "scripts/random-flicker/RandomFlicker.jsx",
+    video: "scripts/random-flicker/demo.mp4",
+    preview: "scripts/random-flicker/preview.mp4",
+    thumbAt: 1.0
+  },
+  {
     id: "allign-c1",
     name: "Allign.c1",
     version: "1.0",
